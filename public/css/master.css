@@ -1,0 +1,25 @@
+/* Core Global Utility & Base Layout Rules */
+@keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom scrollbar styling aligned with the dark slate theme */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #020617; /* Slate 950 */
+}
+::-webkit-scrollbar-thumb {
+    background: #1e293b; /* Slate 800 */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155; /* Slate 700 */
+}
