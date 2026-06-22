@@ -13,17 +13,20 @@ Brodev Cashier Engine is a web-based Point of Sale (POS) system built with **Lar
 
 ## 🛠 Tech Stack
 
-* **Backend:** Laravel 11
+* **Framework:** Laravel 13.8 (PHP 8.3+)
+* **Tools:** Laravel Boost, Laravel Pail, Laravel Pint
 * **Frontend:** Vue.js 3, Tailwind CSS
-* **Database:** MySQL
 * **Build Tool:** Vite
 
 ## 📋 Requirements
 
-* PHP 8.2+
-* Composer
-* Node.js & NPM
-* MySQL/MariaDB
+To run this application, ensure your environment meets the following:
+
+* **PHP:** Version 8.3 or higher
+* **Composer:** Latest version
+* **Node.js & NPM:** Latest LTS version
+* **Database:** MySQL 8.0+ or MariaDB 10.5+
+* **Extensions:** `php-mbstring`, `php-xml`, `php-bcmath`, `php-curl`
 
 ## 📦 Installation
 
