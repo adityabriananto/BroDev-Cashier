@@ -54,7 +54,7 @@ Brodev Cashier Engine is a web-based Point of Sale (POS) system built with **Lar
 5.  **Serve the application:**
     ```bash
     php artisan serve
-    ```
+    
 
 ## 🔐 User Management (Tinker)
 
@@ -69,7 +69,7 @@ php artisan tinker
     'email' => 'admin@example.com',
     'password' => \Illuminate\Support\Facades\Hash::make('yourpassword')
 ]);
-
+```
 
 🤝 Contributing
 Contributions are welcome! If you have suggestions for new features or bug fixes, feel free to open an issue or submit a pull request.
