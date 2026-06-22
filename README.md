@@ -70,6 +70,7 @@ php artisan tinker
     'password' => \Illuminate\Support\Facades\Hash::make('yourpassword')
 ]);
 
+
 🤝 Contributing
 Contributions are welcome! If you have suggestions for new features or bug fixes, feel free to open an issue or submit a pull request.
 
