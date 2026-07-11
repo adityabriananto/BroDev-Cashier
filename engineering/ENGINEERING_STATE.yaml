@@ -9,14 +9,20 @@ mission:
   current_mission: null
   completed_missions:
   - PROJECT-000
+  - PROJECT-006
   mission_history:
   - PROJECT-000
+  - PROJECT-006
 provider:
   current_provider: MockProvider
   provider_history:
   - provider: MockProvider
     mission: null
     started_at: '2026-07-11T03:20:21.761947'
+    finished_at: '2026-07-11T11:13:07.807208'
+  - provider: MockProvider
+    mission: null
+    started_at: '2026-07-11T11:13:07.807212'
     finished_at: null
 session:
   current_session_id: null
@@ -39,6 +45,18 @@ timeline_state:
     event_type: Provider Changed
     description: 'Switched AI Provider to: MockProvider'
     timestamp: '2026-07-11T03:20:21.761947'
+  - id: EV-004
+    event_type: Mission Started
+    description: 'Started mission: PROJECT-007'
+    timestamp: '2026-07-11T11:13:07.712167'
+  - id: EV-005
+    event_type: Mission Completed
+    description: 'Completed mission: PROJECT-007'
+    timestamp: '2026-07-11T11:13:07.789926'
+  - id: EV-006
+    event_type: Provider Changed
+    description: 'Switched AI Provider to: MockProvider'
+    timestamp: '2026-07-11T11:13:07.807221'
 open_questions: []
 blockers: []
 recommendations: []
