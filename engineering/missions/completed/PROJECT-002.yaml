@@ -1,0 +1,44 @@
+version: '1'
+id: 3f1d88fd-e63e-42f9-8759-9ab5c358a1cf
+code: PROJECT-002
+title: Business Domain Model
+description: 'Define the business domains, core entities, responsibilities, business
+  rules, interactions, and domain boundaries for BroDev Cashier.
+
+  '
+status: DONE
+priority: high
+owner: engineering-team
+reviewer: tech-lead
+phase: planning
+goal: 'Establish the official business domain model that will serve as the foundation
+  for architecture, database design, API specification, and feature implementation.
+
+  '
+deliverables:
+- Business Domain Overview
+- Domain Boundaries
+- Domain Responsibilities
+- Core Entities
+- Domain Relationships
+- Business Rules
+- Domain Events
+- Aggregate Candidates
+- Future Expansion Strategy
+constraints:
+- Must align with PROJECT-001 Product Definition
+- Do not design database tables
+- Do not implement application features
+- Do not design API endpoints
+- Focus on business concepts only
+- Store all documents under engineering/missions/deliverables/PROJECT-002
+definition_of_done:
+- Business domains identified
+- Domain boundaries documented
+- Core entities documented
+- Business rules documented
+- Domain relationships documented
+- Future expansion documented
+references:
+- PROJECT-001
+- engineering/missions/deliverables/PROJECT-001/business-domain-model.md
