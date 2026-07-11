@@ -1,0 +1,49 @@
+mission_summary: 'Mission: Repository Discovery (Status: ACTIVE)'
+objective: Scan the Laravel directory structure, dependencies, and requirements to
+  index base knowledge.
+deliverables:
+- Repository Structure Report
+- Technology Stack Report (Laravel on PHP)
+- Backend Architecture Overview
+- Frontend Architecture Overview
+- Dependency Analysis
+- Database Overview
+- Queue & Scheduler Analysis
+- External Integrations Summary
+- Initial Technical Debt Report
+constraints:
+- Do not modify source code files
+- Only parse metadata, configurations, and directory layout
+relevant_rules: []
+relevant_context:
+  framework: Laravel
+  language: PHP
+  project_type: Laravel
+  current_phase: discovery
+  repository_name: BroDev-Cashier
+relevant_references:
+- '[README.md]: Found at repository root'
+- '[package.json]: Found at repository root'
+- '[composer.json]: Found at repository root'
+acceptance_criteria:
+- Repository Structure Report created
+- Technology Stack Report (Laravel on PHP) created
+- Backend Architecture Overview completed
+- Frontend Architecture Overview completed
+- Dependency Analysis completed
+- Database Overview completed
+- Queue & Scheduler Analysis completed
+- External Integrations Summary completed
+- Initial Technical Debt Report created
+definition_of_done:
+- Repository analyzed
+- Architecture documented
+- Technology stack identified
+- PROJECT_STATE updated
+- Engineering baseline established
+warnings:
+- No matching engineering rules found.
+metadata:
+  workspace: BroDev-Cashier
+  compiler_version: 1.3.0
+  generated_at: '2026-07-11T03:19:29Z'

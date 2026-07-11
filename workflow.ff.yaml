@@ -1,0 +1,29 @@
+name: "Autonomous AI Agent Workflow"
+version: "1.3.0"
+initial_state: "CODING"
+
+roles:
+  architect:
+    capability: "architecture"
+    policy: "quality-first"
+  coder:
+    capability: "coding"
+    policy: "cost-first"
+
+states:
+  CODING:
+    name: "AI Coding Session"
+    worker_type: "subprocess"
+    script: "agents/coder.py"
+  TESTING:
+    name: "Automated pytest suite"
+    worker_type: "subprocess"
+    script: "agents/run_tests.py"
+  COMPLETED:
+    name: "Completed successfully"
+    is_final: true
+
+transitions:
+  - { from: "CODING", event: "SUCCESS", to: "TESTING" }
+  - { from: "TESTING", event: "SUCCESS", to: "COMPLETED" }
+  - { from: "TESTING", event: "FAILURE", to: "CODING" }

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,14 +21,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-        $start = LARAVEL_START;
+        $start = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
         View::composer('*', function ($view) use ($start) {
             $executionTime = microtime(true) - $start;
             $memoryUsage = memory_get_peak_usage(true) / 1024 / 1024;
 
             $view->with('performance', [
                 'time' => number_format($executionTime, 3),
-                'memory' => number_format($memoryUsage, 1)
+                'memory' => number_format($memoryUsage, 1),
             ]);
         });
     }

@@ -1,0 +1,33 @@
+version: '1'
+id: d4c53556-5650-4156-b0df-6f69461c0446
+title: Repository Discovery
+description: Scan the Laravel directory structure, dependencies, and requirements
+  to index base knowledge.
+status: DONE
+priority: medium
+owner: owner-role
+reviewer: reviewer-role
+phase: development
+goal: Establish the engineering baseline by scanning and indexing the repository.
+deliverables:
+- Repository Structure Report
+- Technology Stack Report (Laravel on PHP)
+- Backend Architecture Overview
+- Frontend Architecture Overview
+- Dependency Analysis
+- Database Overview
+- Queue & Scheduler Analysis
+- External Integrations Summary
+- Initial Technical Debt Report
+constraints:
+- Do not modify source code files
+- Only parse metadata, configurations, and directory layout
+definition_of_done:
+- Repository analyzed
+- Architecture documented
+- Technology stack identified
+- PROJECT_STATE updated
+- Engineering baseline established
+references:
+- rfc-000
+code: PROJECT-000
