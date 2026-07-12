@@ -2,55 +2,59 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-    public function index() {
+    use ApiResponse;
+
+    public function index()
+    {
         // Mengambil semua data termasuk yang sudah dihapus (Soft Deleted)
         $products = Product::withTrashed()->orderBy('created_at', 'desc')->get();
+
         return view('admin.products', compact('products'));
     }
 
-    public function store(Request $request) {
-        $data = $request->validate([
-            'sku' => 'required|unique:products,sku',
-            'name' => 'required',
-            'price' => 'required|integer',
-            'stock' => 'required|integer',
-        ]);
-        Product::create($data);
-        return response()->json(['success' => true]);
+    public function store(StoreProductRequest $request)
+    {
+        $product = Product::create($request->validated());
+
+        return $this->successResponse($product, 'Product created successfully', 201);
     }
 
-    public function update(Request $request, $id) {
+    public function update(UpdateProductRequest $request, $id)
+    {
         $product = Product::findOrFail($id);
-        $data = $request->validate([
-            'sku' => 'required|unique:products,sku,' . $id,
-            'name' => 'required',
-            'price' => 'required|integer',
-            'stock' => 'required|integer',
-        ]);
-        $product->update($data);
-        return response()->json(['success' => true]);
+        $product->update($request->validated());
+
+        return $this->successResponse($product, 'Product updated successfully');
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         Product::findOrFail($id)->delete();
-        return response()->json(['success' => true]);
+
+        return $this->successResponse(null, 'Product deleted successfully');
     }
 
-    public function restore($id) {
+    public function restore($id)
+    {
         Product::withTrashed()->findOrFail($id)->restore();
-        return response()->json(['success' => true]);
+        $product = Product::findOrFail($id);
+
+        return $this->successResponse($product, 'Product restored successfully');
     }
 
     public function transactionIndex()
     {
         $transactions = Transaction::orderBy('created_at', 'desc')->get();
+
         return view('admin.transactions', compact('transactions'));
     }
 
@@ -58,32 +62,31 @@ class AdminController extends Controller
     public function transactionDetail($id)
     {
         // 1. Tambahkan pengecekan jika transaksi tidak ditemukan
-        $transaction = Transaction::with(['products' => function($query) {
+        $transaction = Transaction::with(['products' => function ($query) {
             $query->withTrashed();
         }])->find($id);
 
-        if (!$transaction) {
-            return response()->json(['success' => false, 'message' => 'Transaction not found'], 404);
+        if (! $transaction) {
+            return $this->errorResponse('Transaction not found', 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'items' => $transaction->products->map(function($product) {
-                // 2. Cek apakah produk sudah benar-benar dihapus (soft delete)
-                $isDeleted = !is_null($product->deleted_at);
+        $items = $transaction->products->map(function ($product) {
+            // 2. Cek apakah produk sudah benar-benar dihapus (soft delete)
+            $isDeleted = ! is_null($product->deleted_at);
 
-                return [
-                    'name' => $product->name,
-                    'sku' => $product->sku,
-                    'quantity' => $product->pivot->quantity,
-                    'price_at_transaction' => (int)$product->pivot->price_at_transaction,
-                    // Menggunakan ternary yang lebih aman
-                    'current_price' => $isDeleted ? null : (int)$product->price,
-                    // Logika perbandingan harga hanya jika produk masih aktif
-                    'is_price_changed' => !$isDeleted && ((int)$product->pivot->price_at_transaction !== (int)$product->price)
-                ];
-            })
-        ]);
+            return [
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'quantity' => $product->pivot->quantity,
+                'price_at_transaction' => (int) $product->pivot->price_at_transaction,
+                // Menggunakan ternary yang lebih aman
+                'current_price' => $isDeleted ? null : (int) $product->price,
+                // Logika perbandingan harga hanya jika produk masih aktif
+                'is_price_changed' => ! $isDeleted && ((int) $product->pivot->price_at_transaction !== (int) $product->price),
+            ];
+        });
+
+        return $this->successResponse($items, 'Transaction details retrieved successfully');
     }
 
     public function dashboardIndex()
@@ -108,14 +111,14 @@ class AdminController extends Controller
             $sevenDaysForm[] = [
                 'date' => $dateDisplay,
                 'revenue' => $sales,
-                'items_sold' => $items ?? 0
+                'items_sold' => $items ?? 0,
             ];
         }
 
         return view('admin.dashboard', [
             'todayRevenue' => $todaySalesRevenue,
             'todayItemsSold' => $todayItemsSold ?? 0,
-            'trends' => $sevenDaysForm
+            'trends' => $sevenDaysForm,
         ]);
     }
 }

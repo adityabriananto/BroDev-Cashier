@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\CheckoutRequest;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CashierController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
         // 1. Ambil data metrik bawaan lo
@@ -25,20 +28,14 @@ class CashierController extends Controller
 
     public function getProducts()
     {
-        return response()->json(Product::where('stock', '>', 0)->get());
+        return $this->successResponse(Product::where('stock', '>', 0)->get(), 'Active products retrieved successfully');
     }
 
-    public function checkout(Request $request)
+    public function checkout(CheckoutRequest $request)
     {
-        $request->validate([
-            'cart' => 'required|array|min:1',
-            'payment_method' => 'required|string',
-            'total' => 'required|integer', // Hanya validasi total yang wajib dari client
-        ]);
-
         // Hitung sendiri di server agar lebih aman dari manipulasi user
-        $subtotal = collect($request->cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        $tax = (int)($subtotal * 0.11); // Contoh pajak 11%
+        $subtotal = collect($request->cart)->sum(fn ($i) => $i['price'] * $i['quantity']);
+        $tax = (int) ($subtotal * 0.11); // Contoh pajak 11%
         $total = $subtotal + $tax;
 
         \Log::info('Data Checkout:', $request->all());
@@ -47,11 +44,11 @@ class CashierController extends Controller
         try {
             // Gunakan variabel hasil hitung server
             $transaction = Transaction::create([
-                'transaction_code' => 'TXS-' . strtoupper(Str::random(8)),
+                'transaction_code' => 'TXS-'.strtoupper(Str::random(8)),
                 'payment_method' => $request->payment_method,
                 'subtotal' => $subtotal,
                 'tax' => $tax,
-                'total' => $total
+                'total' => $total,
             ]);
 
             foreach ($request->cart as $item) {
@@ -65,19 +62,24 @@ class CashierController extends Controller
                 // ATTACH ITEM KE TABEL PIVOT + KUNCI HARGA SAAT INI
                 $transaction->products()->attach($product->id, [
                     'quantity' => $item['quantity'],
-                    'price_at_transaction' => $product->price // Harga historis terkunci
+                    'price_at_transaction' => $product->price, // Harga historis terkunci
                 ]);
             }
 
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Transaction processed successfully!',
-                'code' => $transaction->transaction_code
-            ]);
+
+            return $this->successResponse([
+                'code' => $transaction->transaction_code,
+            ], 'Transaction processed successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+
+            return $this->errorResponse(
+                $e->getMessage(),
+                400,
+                null,
+                str_contains(strtolower($e->getMessage()), 'stock') ? 'insufficient_stock' : null
+            );
         }
     }
 }
