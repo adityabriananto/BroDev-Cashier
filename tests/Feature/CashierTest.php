@@ -52,6 +52,7 @@ class CashierTest extends TestCase
                 ],
             ],
             'payment_method' => 'Cash',
+            'amount_paid' => 30000,
             'total' => 22200, // 20000 + 11% tax (2200) = 22200
         ]);
 
@@ -59,11 +60,14 @@ class CashierTest extends TestCase
             ->assertJson([
                 'status' => 'success',
                 'message' => 'Transaction processed successfully!',
+                'data' => [
+                    'change' => 7800,
+                ],
             ])
             ->assertJsonStructure([
                 'status',
                 'message',
-                'data' => ['code'],
+                'data' => ['code', 'change'],
             ]);
 
         $this->assertEquals(3, $product->fresh()->stock);
@@ -81,6 +85,7 @@ class CashierTest extends TestCase
         $response = $this->postJson(route('api.checkout'), [
             'cart' => [],
             'payment_method' => '',
+            'amount_paid' => -5,
             'total' => 0,
         ]);
 
@@ -92,7 +97,7 @@ class CashierTest extends TestCase
             ->assertJsonStructure([
                 'status',
                 'message',
-                'errors' => ['cart', 'payment_method'],
+                'errors' => ['cart', 'payment_method', 'amount_paid'],
             ]);
     }
 
@@ -112,6 +117,7 @@ class CashierTest extends TestCase
                 ],
             ],
             'payment_method' => 'Cash',
+            'amount_paid' => 30000,
             'total' => 22200,
         ]);
 
@@ -119,6 +125,33 @@ class CashierTest extends TestCase
             ->assertJson([
                 'status' => 'error',
                 'code' => 'insufficient_stock',
+            ]);
+    }
+
+    public function test_checkout_fails_due_to_insufficient_payment_amount(): void
+    {
+        $product = Product::factory()->create([
+            'price' => 10000,
+            'stock' => 5,
+        ]);
+
+        $response = $this->postJson(route('api.checkout'), [
+            'cart' => [
+                [
+                    'id' => $product->id,
+                    'quantity' => 2,
+                    'price' => 10000,
+                ],
+            ],
+            'payment_method' => 'Cash',
+            'amount_paid' => 15000, // less than 22200
+            'total' => 22200,
+        ]);
+
+        $response->assertStatus(400)
+            ->assertJson([
+                'status' => 'error',
+                'code' => 'payment_not_accepted',
             ]);
     }
 }

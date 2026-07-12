@@ -42,18 +42,27 @@ class CashierController extends Controller
         try {
             $transaction = $this->completeSaleAction->execute(
                 $request->cart,
-                $request->payment_method
+                $request->payment_method,
+                (int) $request->amount_paid
             );
 
             return $this->successResponse([
                 'code' => $transaction->transaction_code,
+                'change' => $transaction->change,
             ], 'Transaction processed successfully!');
         } catch (\Exception $e) {
+            $code = null;
+            if (str_contains(strtolower($e->getMessage()), 'stock')) {
+                $code = 'insufficient_stock';
+            } elseif (str_contains(strtolower($e->getMessage()), 'paid') || str_contains(strtolower($e->getMessage()), 'payment')) {
+                $code = 'payment_not_accepted';
+            }
+
             return $this->errorResponse(
                 $e->getMessage(),
                 400,
                 null,
-                str_contains(strtolower($e->getMessage()), 'stock') ? 'insufficient_stock' : null
+                $code
             );
         }
     }

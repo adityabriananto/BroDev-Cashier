@@ -21,13 +21,19 @@ class CompleteSaleAction
      *
      * @throws \Exception
      */
-    public function execute(array $cart, string $paymentMethod): Transaction
+    public function execute(array $cart, string $paymentMethod, int $amountPaid): Transaction
     {
-        return DB::transaction(function () use ($cart, $paymentMethod) {
+        return DB::transaction(function () use ($cart, $paymentMethod, $amountPaid) {
             // Calculate totals on server side
             $subtotal = collect($cart)->sum(fn ($item) => $item['price'] * $item['quantity']);
             $tax = (int) ($subtotal * 0.11); // 11% tax
             $total = $subtotal + $tax;
+
+            if ($amountPaid < $total) {
+                throw new \Exception('Amount paid is insufficient');
+            }
+
+            $change = $amountPaid - $total;
 
             // Create transaction fact
             $transaction = Transaction::create([
@@ -36,6 +42,8 @@ class CompleteSaleAction
                 'subtotal' => $subtotal,
                 'tax' => $tax,
                 'total' => $total,
+                'amount_paid' => $amountPaid,
+                'change' => $change,
             ]);
 
             foreach ($cart as $item) {

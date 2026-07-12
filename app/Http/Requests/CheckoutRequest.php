@@ -28,6 +28,7 @@ class CheckoutRequest extends FormRequest
             'cart.*.quantity' => ['required', 'integer', 'min:1'],
             'cart.*.price' => ['required', 'integer'],
             'payment_method' => ['required', 'string'],
+            'amount_paid' => ['required', 'integer', 'min:0'],
             'total' => ['required', 'integer'],
         ];
     }
