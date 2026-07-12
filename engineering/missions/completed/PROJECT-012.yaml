@@ -16,7 +16,7 @@ description: Mission Objective:Implement the Checkout Workflow module for BroDev
   Implementation Planning- PROJECT-009 Foundation Stabilization- PROJECT-010 Product
   Module Implementation- PROJECT-011 Inventory Module ImplementationDesign Reference:Use
   the aditya-sample-ui repository as the UI/UX reference only.
-status: BACKLOG
+status: DONE
 version: '1'
 priority: high
 deliverables:

@@ -67,6 +67,13 @@ class CashierTest extends TestCase
             ]);
 
         $this->assertEquals(3, $product->fresh()->stock);
+
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'quantity' => -2,
+            'type' => 'sale',
+            'reason' => 'sale completion',
+        ]);
     }
 
     public function test_checkout_fails_validation_with_standard_error_response(): void
