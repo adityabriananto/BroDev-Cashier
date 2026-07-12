@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
-use App\Models\Product;
 use App\Models\Transaction;
+use App\Services\ProductService;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -13,40 +13,43 @@ class AdminController extends Controller
 {
     use ApiResponse;
 
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     public function index()
     {
         // Mengambil semua data termasuk yang sudah dihapus (Soft Deleted)
-        $products = Product::withTrashed()->orderBy('created_at', 'desc')->get();
+        $products = $this->productService->getAllProducts();
 
         return view('admin.products', compact('products'));
     }
 
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create($request->validated());
+        $product = $this->productService->createProduct($request->validated());
 
         return $this->successResponse($product, 'Product created successfully', 201);
     }
 
     public function update(UpdateProductRequest $request, $id)
     {
-        $product = Product::findOrFail($id);
-        $product->update($request->validated());
+        $product = $this->productService->updateProduct($id, $request->validated());
 
         return $this->successResponse($product, 'Product updated successfully');
     }
 
     public function destroy($id)
     {
-        Product::findOrFail($id)->delete();
+        $this->productService->deleteProduct($id);
 
         return $this->successResponse(null, 'Product deleted successfully');
     }
 
     public function restore($id)
     {
-        Product::withTrashed()->findOrFail($id)->restore();
-        $product = Product::findOrFail($id);
+        $this->productService->restoreProduct($id);
+        $product = $this->productService->getProductByIdWithTrashed($id);
 
         return $this->successResponse($product, 'Product restored successfully');
     }

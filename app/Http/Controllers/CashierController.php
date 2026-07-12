@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Services\ProductService;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,6 +14,10 @@ class CashierController extends Controller
 {
     use ApiResponse;
 
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     public function index()
     {
         // 1. Ambil data metrik bawaan lo
@@ -20,7 +25,7 @@ class CashierController extends Controller
         $transactionCount = Transaction::whereDate('created_at', today())->count() ?? 0;
 
         // 2. Tambahkan pengambilan data produk untuk katalog kasir
-        $products = Product::all();
+        $products = $this->productService->getActiveProducts();
 
         // 3. Masukkan 'products' ke dalam compact
         return view('cashier.index', compact('todaySales', 'transactionCount', 'products'));
@@ -28,7 +33,7 @@ class CashierController extends Controller
 
     public function getProducts()
     {
-        return $this->successResponse(Product::where('stock', '>', 0)->get(), 'Active products retrieved successfully');
+        return $this->successResponse($this->productService->getActiveProducts(), 'Active products retrieved successfully');
     }
 
     public function checkout(CheckoutRequest $request)
