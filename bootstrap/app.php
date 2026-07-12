@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -36,6 +38,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 $statusCode = 400;
                 if ($e instanceof HttpExceptionInterface) {
                     $statusCode = $e->getStatusCode();
+                } elseif ($e instanceof AuthenticationException) {
+                    $statusCode = 401;
+                } elseif ($e instanceof AuthorizationException) {
+                    $statusCode = 403;
                 }
 
                 $code = null;

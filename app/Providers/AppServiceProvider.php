@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Repositories\EloquentProductRepository;
+use App\Repositories\EloquentStockMovementRepository;
 use App\Repositories\ProductRepositoryInterface;
+use App\Repositories\StockMovementRepositoryInterface;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             ProductRepositoryInterface::class,
             EloquentProductRepository::class
+        );
+
+        $this->app->bind(
+            StockMovementRepositoryInterface::class,
+            EloquentStockMovementRepository::class
         );
     }
 

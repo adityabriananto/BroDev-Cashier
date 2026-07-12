@@ -13,4 +13,9 @@ class Product extends Model
     protected $fillable = ['sku', 'name', 'price', 'stock'];
 
     protected $dates = ['deleted_at'];
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
 }
