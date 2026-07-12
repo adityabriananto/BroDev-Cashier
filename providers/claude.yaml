@@ -1,0 +1,8 @@
+name: "claude"
+capabilities:
+  reasoning: 95
+  coding: 85
+  review: 98
+cost: "high"
+speed: "medium"
+context_length: 200000

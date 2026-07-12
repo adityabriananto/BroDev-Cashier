@@ -1,0 +1,8 @@
+name: "gemini"
+capabilities:
+  reasoning: 90
+  coding: 80
+  review: 92
+cost: "low"
+speed: "fast"
+context_length: 1000000

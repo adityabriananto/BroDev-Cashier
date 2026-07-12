@@ -1,0 +1,5 @@
+workspace_type: Laravel
+language: PHP
+framework: Laravel
+package_manager: composer
+build_tool: vite

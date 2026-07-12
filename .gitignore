@@ -1,27 +1,105 @@
-*.log
+# ============================================================
+# Operating System
+# ============================================================
+
 .DS_Store
+Thumbs.db
+
+# ============================================================
+# Logs
+# ============================================================
+
+*.log
+
+# ============================================================
+# Environment
+# ============================================================
+
 .env
 .env.backup
 .env.production
+
+# ============================================================
+# IDE / Editor
+# ============================================================
+
+.idea/
+.vscode/
+.zed/
+.nova/
+.cursor/
+.codex/
+
 .phpactor.json
 .phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
+.phpunit.cache
+
+# ============================================================
+# Dependencies
+# ============================================================
+
+node_modules/
+vendor/
+
+# ============================================================
+# Laravel
+# ============================================================
+
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+
 /storage/*.key
 /storage/pail
-/vendor
+
+/auth.json
+
 _ide_helper.php
+
 Homestead.json
 Homestead.yaml
-Thumbs.db
+
+# ============================================================
+# FlowForge Runtime
+# ============================================================
+
+# Runtime cache
+.flowforge/cache/
+
+# Runtime logs
+.flowforge/logs/
+
+# Compiled Mission Packages
+.flowforge/packages/
+
+# Temporary workspace
+.flowforge/workspace/
+
+# Runtime database
+.flowforge/*.db
+flowforge.db
+
+# Runtime session / audit
+.flowforge/**/*.session.yaml
+.flowforge/**/*.runtime.yaml
+.flowforge/**/*.audit.yaml
+
+# Python cache (FlowForge CLI)
+**/__pycache__/
+*.py[cod]
+
+# ============================================================
+# FlowForge Engineering Knowledge
+# ============================================================
+#
+# IMPORTANT:
+# The following files/folders are part of the Engineering
+# Knowledge Base and MUST be committed.
+#
+# engineering/
+# PROJECT_STATE.yaml
+# WORKSPACE.yaml
+#
+# Do NOT add them to .gitignore.
+#

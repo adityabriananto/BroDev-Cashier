@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Actions\Sales\CompleteSaleAction;
+use App\Http\Requests\CheckoutRequest;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Services\ProductService;
+use App\Traits\ApiResponse;
 
 class CashierController extends Controller
 {
+    use ApiResponse;
+
+    public function __construct(
+        protected ProductService $productService,
+        protected CompleteSaleAction $completeSaleAction
+    ) {}
+
     public function index()
     {
         // 1. Ambil data metrik bawaan lo
@@ -17,7 +24,7 @@ class CashierController extends Controller
         $transactionCount = Transaction::whereDate('created_at', today())->count() ?? 0;
 
         // 2. Tambahkan pengambilan data produk untuk katalog kasir
-        $products = Product::all();
+        $products = $this->productService->getActiveProducts();
 
         // 3. Masukkan 'products' ke dalam compact
         return view('cashier.index', compact('todaySales', 'transactionCount', 'products'));
@@ -25,59 +32,38 @@ class CashierController extends Controller
 
     public function getProducts()
     {
-        return response()->json(Product::where('stock', '>', 0)->get());
+        return $this->successResponse($this->productService->getActiveProducts(), 'Active products retrieved successfully');
     }
 
-    public function checkout(Request $request)
+    public function checkout(CheckoutRequest $request)
     {
-        $request->validate([
-            'cart' => 'required|array|min:1',
-            'payment_method' => 'required|string',
-            'total' => 'required|integer', // Hanya validasi total yang wajib dari client
-        ]);
-
-        // Hitung sendiri di server agar lebih aman dari manipulasi user
-        $subtotal = collect($request->cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        $tax = (int)($subtotal * 0.11); // Contoh pajak 11%
-        $total = $subtotal + $tax;
-
         \Log::info('Data Checkout:', $request->all());
 
-        DB::beginTransaction();
         try {
-            // Gunakan variabel hasil hitung server
-            $transaction = Transaction::create([
-                'transaction_code' => 'TXS-' . strtoupper(Str::random(8)),
-                'payment_method' => $request->payment_method,
-                'subtotal' => $subtotal,
-                'tax' => $tax,
-                'total' => $total
-            ]);
+            $transaction = $this->completeSaleAction->execute(
+                $request->cart,
+                $request->payment_method,
+                (int) $request->amount_paid
+            );
 
-            foreach ($request->cart as $item) {
-                $product = Product::lockForUpdate()->find($item['id']);
-                if ($product->stock < $item['quantity']) {
-                    throw new \Exception("Insufficient stock for product: {$product->name}");
-                }
-
-                $product->decrement('stock', $item['quantity']);
-
-                // ATTACH ITEM KE TABEL PIVOT + KUNCI HARGA SAAT INI
-                $transaction->products()->attach($product->id, [
-                    'quantity' => $item['quantity'],
-                    'price_at_transaction' => $product->price // Harga historis terkunci
-                ]);
+            return $this->successResponse([
+                'code' => $transaction->transaction_code,
+                'change' => $transaction->change,
+            ], 'Transaction processed successfully!');
+        } catch (\Exception $e) {
+            $code = null;
+            if (str_contains(strtolower($e->getMessage()), 'stock')) {
+                $code = 'insufficient_stock';
+            } elseif (str_contains(strtolower($e->getMessage()), 'paid') || str_contains(strtolower($e->getMessage()), 'payment')) {
+                $code = 'payment_not_accepted';
             }
 
-            DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Transaction processed successfully!',
-                'code' => $transaction->transaction_code
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            return $this->errorResponse(
+                $e->getMessage(),
+                400,
+                null,
+                $code
+            );
         }
     }
 }
